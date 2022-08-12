@@ -6,8 +6,7 @@
 - 종속성 관리, Dependency Injection (Get.to 할 때)
 - 종속성 관리, Binding (라우트 설정부분에서도 할 수 있다. 똑같다. 단지 Route 에 해준다는것)
 - 기타 유용한 기능
-- GetX Service __
-__
+- GetX Service <br />
 
 
 
