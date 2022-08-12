@@ -47,9 +47,13 @@ class MyApp extends StatelessWidget {
                   return CountControllerWithGetX();});})
               ),
           GetPage(name: "/BindingPageImplementsBindings", page: () => BindingPage(), // named 는 여기에서 처음부터 Binding 을 할 수가 있다.
+/*
               binding: BindingsBuilder(() {
                 Get.create<BindingPageImplementsBindings>(() {
                   return BindingPageImplementsBindings();});})
+*/
+              binding: BindingsBuilder(() {
+                Get.put<BindingPageImplementsBindings>(BindingPageImplementsBindings());})
           ),
           GetPage(name: "/DifferenceBetweenGetXAndGetService", page: () => DifferenceBetweenGetXAndGetService()),
         ],
