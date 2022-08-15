@@ -6,7 +6,7 @@
 - 종속성 관리, Dependency Injection (Get.to 할 때)
 - 종속성 관리, Binding (라우트 설정부분에서도 할 수 있다. 똑같다. 단지 Route 에 해준다는것)
 - 기타 유용한 기능
-- GetX Service\\\\\
+- GetX Service
 
 
 
@@ -35,7 +35,9 @@ void main() => runApp(GetMaterialApp(home: Home())); // 상태관리만 사용�
   Navigator.of(context).push(MaterialPageRoute(builder: (_) => FirstPage()));
   Navigator.of(context).pop(); // 뒤로가기
   Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => Home()), (route)=> false;
-- GetX route
+```
+```dart
+  - GetX route
   Get.to(FirstPage());
   Get.back(); // 뒤로가기
   Get.offAll(Home()); // 이게 문제가 뭐냐면 Home() 이 새롭게 생성된다는 점이다. NamedTo 를 사용하면 그럴일이 없지.
@@ -51,7 +53,7 @@ void main() => runApp(GetMaterialApp(home: Home())); // 상태관리만 사용�
 ```
 - 파일에서 사용할 때
 ```dart
-  Navigatorof(context)pushNamed("/FirstNamedPage");
+  Navigator.of(context).pushNamed("/FirstNamedPage");
 ```
 
 - GetX in GetMaterialApp at main.dart
@@ -78,8 +80,8 @@ void main() => runApp(GetMaterialApp(home: Home())); // 상태관리만 사용�
 ## argument 전달
 - 보내는곳에서
 ```dart
-  Get.toNamed("/next, arguments: "개남");
-  Get.toNamed("/next, arguments: 3);
+  Get.toNamed("/next", arguments: "개남");
+  Get.toNamed("/next", arguments: 3);
   Get.toNamed("/NextNamedPage", arguments: ["개남", "스티브"], ),
   Get.toNamed("/NextNamedPage", arguments: [ {"name": "개남", "age": 52} ], ), // 맵을 보낼 때
   onPressed: () => Get.toNamed("/NextNamedPage", arguments: [User(name: "스티브", age: 52) ], ), // User class 보낼 때
@@ -134,7 +136,7 @@ return ChangeNotifierProvider<CountControllerWithProvider>(
       create: (context) => CountControllerWithProvider(),
       child: GetMaterialApp(),);
 ```
--컨트롤러부분
+- 컨트롤러부분
 ```dart
 class CountControllerWithProvider extends ChangeNotifier { // controller 를 ChangeNotifier 에서 확장하도록 한다.
    int _count = 0; // 초기화를 안해주었구나. 항상 초기화를 해주도록 하자. 되도록이면 초기화 해주면 null 에 대한 문제가 없잖아.
