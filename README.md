@@ -36,9 +36,9 @@ void main() => runApp(GetMaterialApp(home: Home())); // 상태관리만 사용�
   Navigator.of(context).pop(); // 뒤로가기
   Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => Home()), (route)=> false;
 ```
+###### GetX route
 ```dart
-  - GetX route
-  Get.to(FirstPage());
+ Get.to(FirstPage());
   Get.back(); // 뒤로가기
   Get.offAll(Home()); // 이게 문제가 뭐냐면 Home() 이 새롭게 생성된다는 점이다. NamedTo 를 사용하면 그럴일이 없지.
 ```
