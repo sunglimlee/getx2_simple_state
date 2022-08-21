@@ -360,7 +360,8 @@ onPressed: () {
 
 # 종속성 관리 - Binding (라우트 설정부분에서도 할 수 있다.)
 1. GetmaterialApp 내에서 getPages 안에 binding 하는 방법
-2. Binding 클래스를 상속받아서 getPages 안에 binding 하는 방법
+2. Bindings 클래스를 상속받아서 getPages 안에 binding 하는 방법
+3. Bindings 클래스를 상속받아서 GetxMaterialApp() 안에 'initBinding : InitBinding()',
 
 ## 1. GetmaterialApp 내에서 getPages 안에 binding 하는 방법
 ```dart
@@ -392,6 +393,17 @@ getPages: [
 ],
 ```
 
+## 3. Binding 클래스를 상속받아서 GetxMaterialApp() 안에 'initBinding : CountControllerWithGetX()',
+```dart
+class InitBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.put(BottomNavController(), permanant: true); // permanant 로 인해서 계속 살아있게 된다.
+    // 그말은 여기에 계속 추가해서 넣어줄 수 있다는 건가??? 한번보자.
+  }
+}
+
+```
 
 # 기타 유용한 기능
 1. `Get.find<CountControllerwithGetX>().increment();` static 사용하기 
@@ -452,6 +464,7 @@ class GetxServiceTest extends GetxService {
 ![This is an image](https://myoctocat.com/assets/images/base-octocat.svg)
 
 - [Markdown CheetSheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+- [other markdown Tools](https://github.com/adam-p/markdown-here/wiki/Other-Markdown-Tools)
 
 # The largest heading
 ## The second largest heading
@@ -524,6 +537,44 @@ Quote break.
 
 > This is a very long line that will still be quoted properly when it wraps. Oh boy let's keep writing to make sure this is long enough to actually wrap for everyone. Oh, you can *put* **Markdown** into a blockquote. 
 ```
+
+#### inline HTML
+```markdown
+<dl>
+  <dt>Definition list</dt>
+  <dd>Is something people use sometimes.</dd>
+
+  <dt>Markdown in HTML</dt>
+  <dd>Does *not* work **very** well. Use HTML <em>tags</em>.</dd>
+</dl>
+```
+
+#### Horizontal Rule
+```markdown
+Three or more...
+
+---
+
+Hyphens
+
+***
+
+Asterisks
+
+___
+
+Underscores
+```
+
+#### YoutTube Videos
+```markdown
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
+" target="_blank"><img src="http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+```
+#### mailto link
+[example@gitlab.com](mailto:example@gitlab.com)
+
 This project is a starting point for a Flutter application.
 
 A few resources to get you started if this is your first Flutter project:
