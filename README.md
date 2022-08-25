@@ -1,6 +1,6 @@
-
 # GetX 란?
 > GetX 는 미니 프레임 워크이다. 생산성, 성능, 조직화(MVC, MVVM 즉 Clean Code)
+- [Get X Official Link](https://chornthorn.github.io/getx-docs/route-management/index)
 - 라우트 관리
 - 상태관리, State Management
 - 종속성 관리, Dependency Injection (Get.to 할 때)
