@@ -431,6 +431,7 @@ class GetxServiceTest extends GetxService {
 1. `Get.find<CountControllerwithGetX>().increment();` static 사용하기 
 2. Stateless 위젯대신 GetView<CountControllerWithGetX> 로 확장하기
 3. context 필요한? `Get.context!` ㅋㅋㅋ
+4. navigator instead of using Navigator
 
 ## 1. controller 클래스에서 static  사용하기
 >  이렇게 find 로 접근해서 값을 증가시켰는데 controller 객체에서 static 을 사용하면 훨씬 쉽게 사용할 수 있다.
@@ -466,7 +467,19 @@ onPressed: () { controller.increment(); // 이렇게 바로 접근가능하다. 
 > context 값 `Get.context!;`
 > with 값 `Get.width * 0.7;`
 
-
+## 4. navigator instead of using Navigator
+```dart
+        GestureDetector(
+          onTap: () {
+            RootController.to.setCategoryPage(true);
+            // GetX 를 사용하면 Navigator 도 이렇게 navigator 로 사용하며, context 가 필요없다.
+            navigator?.push( // 봐라.. 이미 nested Navigator 안에 들어와 있다.
+                MaterialPageRoute(
+                    builder: (context) => const ExploreDetailPage()));
+          },
+          child: Container(
+            margin: const EdgeInsets.all(8),
+```
 
 
 
