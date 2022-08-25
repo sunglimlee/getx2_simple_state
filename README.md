@@ -5,8 +5,8 @@
 - 상태관리, State Management
 - 종속성 관리, Dependency Injection (Get.to 할 때)
 - 종속성 관리, Binding (라우트 설정부분에서도 할 수 있다. 똑같다. 단지 Route 에 해준다는것)
-- 기타 유용한 기능
 - GetX Service
+- 기타 유용한 기능
 
 
 
@@ -393,21 +393,44 @@ getPages: [
 ],
 ```
 
-## 3. Binding 클래스를 상속받아서 GetxMaterialApp() 안에 'initBinding : CountControllerWithGetX()',
+## 3. Binding 클래스를 상속받아서 GetMaterialApp() 안에 'initialBinding : CountControllerWithGetX()',
+> 한꺼번에 Get.put 을 하는데 유용하다. ⭐⭐⭐⭐⭐
+- [Binding 에 대한 링크 예제](https://chornthorn.github.io/getx-docs/dependency-management/binding/)
 ```dart
-class InitBinding extends Bindings {
+class UsingBindingsClass extends Bindings {
   @override
   void dependencies() {
     Get.put(BottomNavController(), permanant: true); // permanant 로 인해서 계속 살아있게 된다.
     // 그말은 여기에 계속 추가해서 넣어줄 수 있다는 건가??? 한번보자.
   }
 }
-
 ```
+```dart
+initialBinding: UsingBindingsClass(), // GetMaterialApp() 안에서
+// initialBinding: BindingsBuilder(() {Get.put(BottomNavController() }), // BottomNavController() 가 Bindings 상속받지 않았을 때
+```
+
+# GetxService
+> 컨트롤러를 사용해서 최상단에 Get.put 을 사용해서 controller 의 지속성을 유지시켜 줄 수 있는데 GetxService 를 사용하면 clear() 하기전까지 안죽고 계속 유지되게 할 수 있다.
+```dart
+void initService() {
+  Get.put(GetxControllerTest(), permanent : true); // permananent 를 꼭 해주어야 한다.
+}
+```
+> 그런데 controller 가 GetxService 를 상속받게 되면 그때부터는 지속성을 유지시켜 줄 수 있게 된다.
+```dart
+// 단지 GetxService 를 상속받았을 뿐인데 메모리에 계속 살아있게 된다.
+// Get.reset() 를 하면 메모리에 살아있는 모든 controller 를 지우게 된다.
+class GetxServiceTest extends GetxService {
+  void increment() { _count++;}
+}
+```
+
 
 # 기타 유용한 기능
 1. `Get.find<CountControllerwithGetX>().increment();` static 사용하기 
 2. Stateless 위젯대신 GetView<CountControllerWithGetX> 로 확장하기
+3. context 필요한? `Get.context!` ㅋㅋㅋ
 
 ## 1. controller 클래스에서 static  사용하기
 >  이렇게 find 로 접근해서 값을 증가시켰는데 controller 객체에서 static 을 사용하면 훨씬 쉽게 사용할 수 있다.
@@ -439,23 +462,9 @@ onPressed: () { controller.increment(); // 이렇게 바로 접근가능하다. 
 }
 ```
 
-
-# GetxService 
-> 컨트롤러를 사용해서 최상단에 Get.put 을 사용해서 controller 의 지속성을 유지시켜 줄 수 있는데 GetxService 를 사용하면 clear() 하기전까지 안죽고 계속 유지되게 할 수 있다.
-```dart
-void initService() {
-  Get.put(GetxControllerTest(), permanent : true); // permananent 를 꼭 해주어야 한다.
-}
-```
-> 그런데 controller 가 GetxService 를 상속받게 되면 그때부터는 지속성을 유지시켜 줄 수 있게 된다.
-```dart
-// 단지 GetxService 를 상속받았을 뿐인데 메모리에 계속 살아있게 된다.
-// Get.reset() 를 하면 메모리에 살아있는 모든 controller 를 지우게 된다.
-class GetxServiceTest extends GetxService {
-  void increment() { _count++;}
-}
-```
-
+## 3. context 필요하니? `Get.context!` ㅋㅋㅋ
+> context 값 `Get.context!;`
+> with 값 `Get.width * 0.7;`
 
 
 
