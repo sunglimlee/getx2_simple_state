@@ -15,7 +15,7 @@
 ###### pubspec.yaml 에서
 dependencies :
 get: ^3.24.0
-
+ 
 ###### main.dart 에서
 ```dart
 void main() => runApp(GetMaterialApp(home: Home())); // 상태관리만 사용한다면 GetMaterialApp 을 사용하지 않아도 된다.
