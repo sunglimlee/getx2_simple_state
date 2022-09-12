@@ -6,6 +6,7 @@
 - 종속성 관리, Dependency Injection (Get.to 할 때)
 - 종속성 관리, Binding (라우트 설정부분에서도 할 수 있다. 똑같다. 단지 Route 에 해준다는것)
 - GetX Service
+- Nested Navigation
 - 기타 유용한 기능
 
 
@@ -261,6 +262,15 @@ ElevatedButton( // id 를 부여해서 버턴을 다로 연결하는게 가능�
     Get.find<CountControllerWithReactiveGetX>().putNumber(5); //기억나지? 만약에 위에서 바로 Get.put 을 사용하고 변수에 등록하면 find 사용할 필요없다는것.
   },),
 ```
+
+- Rx 데이터 업데이트할 때 하는 방법
+```dart
+final isOpen = false.obs;
+
+// NOTHING will happen... same value.
+void onButtonTap() => isOpen.value=false; // 이게 생각보다 아주 중용하다. value 사용한 것 봐라.
+```
+
 ## 이벤트 트리거
 ###### 반응형일 때 이벤트에 따라 여러가지 기능을 구현할 수 있다. GetxController 를 상속받아야 한다.
 ```dart
@@ -280,6 +290,15 @@ onDelete() {}
 ```
 
 ###### Rx Type 
+> null 로 객체를 초기화를 시킬때 사용하는 너무나도 중요한 부분이다. 
+> 되도록이면 _ 프라이빗으로 사용하지 마라. value 값을 사용하는데 문제가 된다.
+```dart
+  Rx<AssetEntity?> selectedImage = (null as AssetEntity?).obs; // 이부분을 찾기 위해서 일주일을 허비했다.
+  var imageList = <AssetEntity>[].obs;
+  List<AssetPathEntity> _albums = <AssetPathEntity>[].obs;
+  var headerTitle = ''.obs;
+```
+
 ```dart
 enum NUM {FIRST, SECOND}
 class User {
@@ -293,6 +312,8 @@ RxString string = "".obs; // 모든 타입이 다 있다.
 Rx<NUM> nums = NUM.FIRST.obs; // enum type
 Rx<User> user = User(name: "개남", age: 25).obs; // 데이터 클래스 타입
 RxList<String> list = [""].obs; // 또는 <String>[].obs;
+final items = <String>[].obs;
+final myMap = <String, int>{}.obs;
 
 void increment() {
   count++;
@@ -305,13 +326,123 @@ void increment() {
   list.add();
   list.addIf(user.vale.name == "스티브", "okay"); // 리스트는 자봐라.
 }
+
+// 이렇게 Rx<> Generics 으로 사용할 수도 있다.
+final name = Rx<String>('');
+final isLogged = Rx<Bool>(false);
+final count = Rx<Int>(0);
+final balance = Rx<Double>(0.0);
+final number = Rx<Num>(0);
+final items = Rx<List<String>>([]);
+final myMap = Rx<Map<String, int>>({});
+// Custom classes - it can be any class, literally
+  final user = Rx<User>();
+  final name = ''.obs;
+  final isLogged = false.obs;
+  final count = 0.obs;
+  final balance = 0.0.obs;
+  final number = 0.obs;
+  final items = <String>[].obs;
+  final myMap = <String, int>{}.obs;
+
+  // Custom classes - it can be any class, literally
+  final user = User().obs;
+  // 항상 기억하자. 되도록이면 초기화를 꼭 해주도록 하자.
+  // As we know, Dart is now heading towards null safety. To be prepared, from now on, you should always start your Rx variables with an initial value.
+  // You will literally add a " .obs " to the end of your variable, and that’s it, you’ve made it observable, and its .value , well, will be the initial value).
+```
+```dart
+name.value = 'Hey';
+
+// All Rx properties are "callable" and returns the new value.
+// but this approach does not accepts `null`, the UI will not rebuild.
+name('Hello');
+
+final flag = false.obs;
+
+// switches the value between true/false
+flag.toggle();
+
+// Sets the `value` to null.
+flag.nil();
+
+```
+
+```dart
+// 두번째 예제들
+// controller file
+final count1 = 0.obs;
+final count2 = 0.obs;
+int get sum => count1.value + count2.value; // 항상 value 를 사용한다.
+
+GetX<Controller>(
+  builder: (controller) {
+  print("count 2 rebuild");
+  return Text('${controller.count2.value}'); },
+),
+GetX<Controller>(
+  builder: (controller) {
+  print("count 3 rebuild");
+  return Text('${controller.sum}');},
+),
+
+```
+```dart
+class RxUser {
+  final name = "Camila".obs;
+  final age = 18.obs;
+}
+
+class User {
+  User({String name, int age});
+  var name;
+  var age;
+}
+
+// when instantianting:
+final user = User(name: "Camila", age: 18).obs;
+```
+
+```dart
+// On the controller
+final String title = 'User Info:'.obs
+final list = List<User>().obs;
+
+// on the view
+Text(controller.title.value), // String need to have .value in front of it
+ListView.builder ( // 리스트는 .value 사용할 필요가 없다.
+  itemCount: controller.list.length // lists don't need it
+)
+```
+
+```dart
+class User() {
+  User({this.name = '', this.age = 0});
+  String name;
+  int age;
+}
+
+// on the controller file
+final user = User().obs;
+// when you need to update the user variable:
+user.update( (user) { // this parameter is the class itself that you want to update
+user.name = 'Jonny';
+user.age = 18;
+});
+// an alternative way of update the user variable:
+user(User(name: 'João', age: 35));
+
+// on view:
+Obx(()=> Text("Name ${user.value.name}: Age: ${user.value.age}"))
+// you can also access the model values without the .value:
+user().name; // notice that is the user variable, not the class (variable has lowercase u)
 ```
 
 
 # 종속성 관리 (Defendency Injection)
 > 알다시피 메모리 절감을 위해서 사용하는 차원이고 계속 끌고가고 싶으면 GetxService 를 사용하도록 하자.
 > 총 5가지의 방법이 있다.
-1. 원래 방법대로 Get.put 을 이용해서 어디든지 넣어주는 방법
+1. 원래 방법대로 Get.put 을 이용해서 어디든지 넣어주는 방법 ( 이 말뜻 그대로 Get.put 을 쓰면 전체 App 에서 사용할 수 있다.)
 2. Get.to 페이지 전환하면서 binding 속성안에 Get.put 으로 넣어주는 방법
 3. Get.to 페이지 전환하면서 binding 속성안에 Get.lazyPut 으로 넣어주는 방법
 4. Get.to 페이지 전환하면서 binding 속성안에 Get.putAsync 으로 넣어주는 방법
@@ -400,13 +531,14 @@ getPages: [
 class UsingBindingsClass extends Bindings {
   @override
   void dependencies() {
-    Get.put(BottomNavController(), permanant: true); // permanant 로 인해서 계속 살아있게 된다.
+    Get.put(BottomNavController(), permanant: true, tag: "some unique string"); // permanant 로 인해서 계속 살아있게 된다. // 태그로 같은 클래스의 여러개의 인스턴스 구별때 사용한다.
     // 그말은 여기에 계속 추가해서 넣어줄 수 있다는 건가??? 한번보자.
   }
 }
 ```
 ```dart
-initialBinding: UsingBindingsClass(), // GetMaterialApp() 안에서
+// 이거 왜 쓰는데? 전체에게 적용되는 Binding 을 적욛할 때 사용해준다.
+initialBinding: UsingBindingsClass(), // GetMaterialApp() 안에서 
 // initialBinding: BindingsBuilder(() {Get.put(BottomNavController() }), // BottomNavController() 가 Bindings 상속받지 않았을 때
 ```
 
@@ -426,12 +558,97 @@ class GetxServiceTest extends GetxService {
 }
 ```
 
+# Nested Navigation
+```dart
+  // 라우트가 안에 있고, 안에서 페이지 생성하는 방법
+  Widget settingNavigator1() {
+    return Navigator(
+        key: Get.nestedKey(1), // create a key by index
+        initialRoute: '/',
+        onGenerateRoute: (settings) {
+          if (settings.name == '/') {
+            return GetPageRoute(
+              page: () => Scaffold(
+                appBar: AppBar(
+                  title: Text("Main"),
+                ),
+                body: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.toNamed('/SettingDetailPage', id:1); // navigate by your nested route by index
+                    },
+                    child: Text("Go to Setting Detail Page"),
+                  ),
+                ),
+              ),
+            );
+          } else if (settings.name == '/SettingDetailPage') {
+            return GetPageRoute(
+              page: () => Center(
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Text("Main"),
+                  ),
+                  body: Center(
+                      child:  Text("Setting Detail Page")
+                  ),
+                ),
+              ),
+            );
+          }
+        }
+    );
+  }
+  // 라우트가 안에 있고, 밖의 페이지를 생성하는 방법
+  Widget settingNavigator2() {
+    return Navigator(
+        key: Get.nestedKey(1), // create a key by index, 이 자체가 Global Key 이구나.
+        initialRoute: '/',
+        onGenerateRoute: (settings) {
+          if (settings.name == '/') {
+            return GetPageRoute(
+              page: () => Setting(),
+            );
+          } else if (settings.name == '/SettingDetailPage') {
+            return GetPageRoute(
+              page: () => Center(
+                child: SettingDetail(),
+              ),
+            );
+          }
+        }
+    );
+  }
+  // Navigator 로 감싼 방식
+  Widget settingNavigator3() {
+    return Navigator(
+      key: Get.nestedKey(1),
+      onGenerateRoute: (settings) {
+        return GetPageRoute(
+          page: () => Setting(),
+        );
+      },
+    );
+  }
+  // 라우터를 밖에 만들고
+  // Map 을 사용한 방식
+  Widget settingNavigator4() {
+    return const SettingNavigator();
+  }
+
+```
 
 # 기타 유용한 기능
 1. `Get.find<CountControllerwithGetX>().increment();` static 사용하기 
 2. Stateless 위젯대신 GetView<CountControllerWithGetX> 로 확장하기
 3. context 필요한? `Get.context!` ㅋㅋㅋ
 4. navigator instead of using Navigator
+5. Get.snackbar
+6. Get.dialog
+7. Get.bottomSheet
+8. is Email validate? GetUtils.isEmail('steve.patriot@gmail.com') ? validate() : errorMessage();
+9. MediaQuery and Screen
+10. Get.defaultDialog
 
 ## 1. controller 클래스에서 static  사용하기
 >  이렇게 find 로 접근해서 값을 증가시켰는데 controller 객체에서 static 을 사용하면 훨씬 쉽게 사용할 수 있다.
@@ -480,7 +697,186 @@ onPressed: () { controller.increment(); // 이렇게 바로 접근가능하다. 
           child: Container(
             margin: const EdgeInsets.all(8),
 ```
+## 5. Get.snackbar
+```dart
+Get.snackbar(
+  "Hey i'm a Get SnackBar!", // title
+  "It's unbelievable! I'm using SnackBar without context, without boilerplate, without Scaffold, it is something truly amazing!", // message
+  icon: Icon(Icons.alarm),
+  shouldIconPulse: true,
+  onTap:(){},
+  barBlur: 20,
+  isDismissible: true,
+  duration: Duration(seconds: 3),
+);
+```
+```dart
+// check if snackbar is open
+Get.isSnackbarOpen
 
+// check if dialog is open
+Get.isDialogOpen
+
+// check if bottomsheet is open
+Get.isBottomSheetOpen
+
+```
+## 6. Get.dialog
+```dart
+Get.dialog(YourDialogWidget());
+```
+```dart
+Get.defaultDialog(
+  onConfirm: () => print("Ok"),
+  middleText: "Dialog made in 3 lines of code"
+);
+```
+## 7. Get.bottomSheet
+```dart
+Get.bottomSheet(
+  Container(child: Wrap(
+    children: <Widget>[
+      ListTile(leading: Icon(Icons.music_note), title: Text('Music'),
+        onTap: () {}),
+      ListTile(leading: Icon(Icons.videocam),title: Text('Video'),
+        onTap: () {},),
+    ],),
+  )
+);
+```
+## 8. is Email validate? 
+```dart
+GetUtils.isEmail('steve.patriot@gmail.com') ? validate() : errorMessage();
+```
+## 9. MediaQuery and Screen
+```dart
+//Check in what platform the app is running
+GetPlatform.isAndroid
+GetPlatform.isIOS
+GetPlatform.isMacOS
+GetPlatform.isWindows
+GetPlatform.isLinux
+GetPlatform.isFuchsia
+
+//Check the device type
+GetPlatform.isMobile
+GetPlatform.isDesktop
+//All platforms are supported independently in web!
+//You can tell if you are running inside a browser
+//on Windows, iOS, OSX, Android, etc.
+GetPlatform.isWeb
+
+
+// Equivalent to : MediaQuery.of(context).size.height,
+// but immutable.
+Get.height
+Get.width
+
+// Gives the current context of the Navigator.
+Get.context
+
+// Gives the context of the snackbar/dialog/bottomsheet in the foreground, anywhere in your code.
+Get.contextOverlay
+
+// Note: the following methods are extensions on context. Since you
+// have access to context in any place of your UI, you can use it anywhere in the UI code
+
+// If you need a changeable height/width (like Desktop or browser windows that can be scaled) you will need to use context.
+context.width
+context.height
+
+// Gives you the power to define half the screen, a third of it and so on.
+// Useful for responsive applications.
+// param dividedBy (double) optional - default: 1
+// param reducedBy (double) optional - default: 0
+context.heightTransformer()
+context.widthTransformer()
+
+/// Similar to MediaQuery.of(context).size
+context.mediaQuerySize()
+
+/// Similar to MediaQuery.of(context).padding
+context.mediaQueryPadding()
+
+/// Similar to MediaQuery.of(context).viewPadding
+context.mediaQueryViewPadding()
+
+/// Similar to MediaQuery.of(context).viewInsets;
+context.mediaQueryViewInsets()
+
+/// Similar to MediaQuery.of(context).orientation;
+context.orientation()
+
+/// Check if device is on landscape mode
+context.isLandscape()
+
+/// Check if device is on portrait mode
+context.isPortrait()
+
+/// Similar to MediaQuery.of(context).devicePixelRatio;
+context.devicePixelRatio()
+
+/// Similar to MediaQuery.of(context).textScaleFactor;
+context.textScaleFactor()
+
+/// Get the shortestSide from screen
+context.mediaQueryShortestSide()
+
+/// True if width be larger than 800
+context.showNavbar()
+
+/// True if the shortestSide is smaller than 600p
+context.isPhone()
+
+/// True if the shortestSide is largest than 600p
+context.isSmallTablet()
+
+/// True if the shortestSide is largest than 720p
+context.isLargeTablet()
+
+/// True if the current device is Tablet
+context.isTablet()
+
+/// Returns a value<T> according to the screen size
+/// can give value for:
+/// watch: if the shortestSide is smaller than 300
+/// mobile: if the shortestSide is smaller than 600
+/// tablet: if the shortestSide is smaller than 1200
+/// desktop: if width is largest than 1200
+context.responsiveValue<T>()
+```
+## 10. Get.defaultDialog
+```dart
+  Future<bool> willPopAction() async {
+    //https://stackoverflow.com/questions/45109557/flutter-how-to-programmatically-exit-the-app
+    if (bottomHistory.length == 1) {
+      if (Platform.isAndroid || Platform.isIOS) {
+        Get.defaultDialog(title: 'close',
+            content: Text('Do you want to close?'),
+            textConfirm: "Close",
+            textCancel: "Cancel",
+            onConfirm: () {
+              if (Platform.isAndroid) {
+                SystemNavigator.pop();
+              } else if (Platform.isIOS) {
+                exit(
+                    0); // or use pub.dev/packages/minimize_app   MinimizeApp.minimizeApp();
+              }
+            },
+            onCancel: () => Get.back());
+        return true;
+      } else { return false;}
+    } else {
+      print('goto before page!'); // 현재는 아무것도 움직이지 않잖아????
+      bottomHistory.removeLast(); // 마지막걸 지우고..
+      print(bottomHistory);
+      var index = bottomHistory.last;
+      changeBottomNav(index, isTapped: false); // 여기 보이나? 탭으로 바꿔주고 있다는 걸... 결국 이게 맞네.. 내가 한게 맞았네..
+      return false;
+    }
+  }
+
+```
 
 
 ![This is an image](https://myoctocat.com/assets/images/base-octocat.svg)
