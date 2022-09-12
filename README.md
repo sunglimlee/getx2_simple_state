@@ -22,7 +22,6 @@ void main() => runApp(GetMaterialApp(home: Home())); // 상태관리만 사용�
 ```
 
 
-
 # 라우트 관리
 - 기본 페이지 라우팅(기존 Navigator 와 GetX route 차이)
 - Named 페이지 라우팅 (기존 Navigator 와 GetX route 차이)
